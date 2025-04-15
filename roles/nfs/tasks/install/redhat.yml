@@ -1,0 +1,26 @@
+---
+- name: rhel install | Install nfs-ganesha packages
+  when: nfs_server == 'ganesha'
+  package:
+    name: ['nfs-ganesha-ceph', 'nfs-ganesha-rados-grace', 'nfs-ganesha-rados-urls']
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: rhel install | install nfs-utils
+  when: nfs_server == 'kernel'
+  block:
+    - name: install nfs cephfs gateway
+      package:
+        name: nfs-utils
+        state: "latest"
+      register: result
+      until: result is succeeded
+
+- name: rhel install | install pacemaker/corosync/pcs
+  when: nfs_rados_backend_driver == "rados_ng"
+  package:
+    name: ['pacemaker', 'corosync', 'pcs']
+    state: present
+  register: result
+  until: result is succeeded

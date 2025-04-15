@@ -1,0 +1,49 @@
+---
+- name: configure nfs-ganesha | create /etc/ganesha
+  file:
+    path: /etc/ganesha
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: configure nfs-ganesha | generate ganesha configuration file
+  template:
+    src: "ganesha.conf.j2"
+    dest: "/etc/ganesha/ganesha.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: configure nfs-ganesha | setup for Active/Active configuration
+  when:
+    - nfs_rados_backend | bool
+    - nfs_rados_backend_driver == 'rados_cluster'
+  block:
+    - name: configure nfs-ganesha | check if rados rados grace db object exists
+      shell: "rados -p {{ nfs_ganesha_pool }} -n {{ nfs_grace_namespace }} --cluster {{ cluster }} ls | grep grace/"
+      changed_when: false
+      failed_when: false
+      register: rados_grace_exists
+      check_mode: no
+      delegate_to: "{{ groups['mons'][0] }}"
+
+    - name: configure nfs-ganesha | initialize ganesha rados grace database
+      command: "ganesha-rados-grace -p {{ nfs_ganesha_pool }} -n {{ nfs_grace_namespace }} add {{ ansible_hostname }}"
+      when: rados_grace_exists.rc != 0
+
+- name: configure nfs-ganesha | check if rados export index object exists
+  shell: "rados -p {{ nfs_ganesha_pool  }} -N {{ nfs_export_namespace }} --cluster {{ cluster }} ls|grep conf-{{ ansible_hostname }}/"
+  changed_when: false
+  failed_when: false
+  register: rados_index_exists
+  check_mode: no
+  when: nfs_rados_backend | bool
+  delegate_to: "{{ groups['mons'][0] }}"
+
+- name: configure nfs-ganesha | create an empty rados export index object
+  command: "rados -p {{ nfs_ganesha_pool }} -N {{ nfs_export_namespace }} --cluster {{ cluster }} put conf-{{ ansible_hostname }} /dev/null"
+  when:
+    - nfs_rados_backend | bool 
+    - rados_index_exists.rc != 0
+  delegate_to: "{{ groups['mons'][0] }}"

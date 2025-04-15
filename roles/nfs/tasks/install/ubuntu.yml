@@ -1,0 +1,24 @@
+---
+- name: ubuntu install | install nfs-ganesha packages
+  when: nfs_server == 'ganesha'
+  apt:
+    name: ['nfs-ganesha', 'nfs-ganesha-ceph', 'nfs-ganesha-rados-grace', 'nfs-ganesha-rados-urls']
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: ubuntu install | install nfs-kernel packages
+  when: nfs_server == 'kernel'
+  apt:
+    name: ['nfs-kernel-server', 'nfs-common']
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: ubuntu systems - install pacemaker/corosync/pcs
+  when: nfs_rados_backend_driver == "rados_ng"
+  apt:
+    name: ['pacemaker', 'corosync', 'pcs']
+    state: present
+  register: result
+  until: result is succeeded

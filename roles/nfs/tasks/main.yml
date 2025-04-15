@@ -1,0 +1,12 @@
+---
+- name: include validate tasks 
+  include: validate/main.yml
+
+- name: include install tasks
+  include: install/main.yml
+
+- name: include configure tasks
+  include: configure/main.yml
+
+- name: include start nfs tasks
+  include: start/main.yml

@@ -1,0 +1,103 @@
+---
+- name: cephfs backend | configure nfs directory on cephfs
+  run_once: true
+  block:
+    - name: cephfs backend | Get admin secret
+      command: "ceph auth get-key client.admin"
+      register: command_output_admin
+      delegate_to: "{{ groups['mons'][0] }}"
+      changed_when: false
+
+    - name: cephfs backend | Set admin secret fact
+      set_fact:
+        cephfs_admin_secret: "{{ command_output_admin.stdout }}"
+
+    - name: cephfs backend | Ensure cephfs root dir exists
+      file:
+        path: "/mnt/cephfs/root"
+        state: directory
+        mode: 0755
+
+    - name: cephfs backend | Mount cephfs as admin user 
+      mount:
+        name: "/mnt/cephfs/root"
+        src: ":/"
+        fstype: "ceph"
+        opts: "name=admin,secret={{ cephfs_admin_secret }},_netdev,noatime"
+        state: mounted
+
+    - name: cephfs backend | Create directory for nfsroot
+      file:
+        path: "/mnt/cephfs/root/{{ nfs_fs_root }}"
+        state: directory
+        owner: root
+        group: ceph
+        mode: 0775
+
+    - name: cephfs backend | Unmount cephfs as admin user 
+      mount:
+        name: "/mnt/cephfs/root"
+        state: absent 
+
+- name: cephfs backend | Create NFS cephx user
+  ceph_key:
+    name: "{{ item.name }}"
+    state: present
+    caps: "{{ item.caps }}"
+    cluster: "{{ cluster }}"
+    secret: "{{ item.key | default('') }}"
+  with_items: "{{ nfs_keyring }}"
+  delegate_to: "{{ groups['mons'][0] }}"
+
+- name: create pool for nfs-ganesha
+  when: nfs_server == 'ganesha'
+  ceph_pool:
+    name: "{{ nfs_ganesha_pool }}"
+    cluster: "{{ cluster }}"
+    pg_num: 2
+    pgp_num: 2
+    application: nfs-ganesha
+    size: 3
+    min_size: 2
+    pool_type: replicated
+  delegate_to: "{{ groups['mons'][0] }}"
+  run_once: true
+
+- name: cephfs backend |  cephfs nfs gateway
+  when: nfs_server == 'kernel'
+  block:
+    - name: cephfs backend | Get nfs secret for cephfs mount
+      command: "ceph auth get-key client.nfs"
+      register: command_output_nfs
+      changed_when: false
+      delegate_to: "{{ groups['mons'][0] }}"
+
+    - name: cephfs backend | Set nfs secret fact
+      set_fact:
+        cephfs_nfs_secret: "{{ command_output_nfs.stdout }}"
+      run_once: true
+
+    - name: cephfs backend | write ceph nfs client secret
+      copy:
+        content: "{{ cephfs_nfs_secret }}"
+        dest: /etc/ceph/nfs.secret
+        force: yes
+        group: ceph
+        owner: ceph
+        mode: "0600"
+
+    - name: cephfs backend | create local directory for share mount
+      file:
+        path: "{{ nfs_shared_storage_mountpoint }}"
+        owner: "root"
+        group: "root"
+        mode: '0775'
+        state: directory
+
+    - name: cephfs backend | mount share
+      mount:
+        name: "{{ nfs_shared_storage_mountpoint }}"
+        src: ":/nfs"
+        fstype: "ceph"
+        opts: "name=nfs,secretfile=/etc/ceph/nfs.secret,_netdev,relatime"
+        state: mounted

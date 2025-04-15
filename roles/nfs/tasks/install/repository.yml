@@ -1,0 +1,55 @@
+---
+#- name: add 45drives repo 
+
+- name: rhel repo setup | enable rhel repos
+  when: ansible_facts['os_family'] == 'RedHat'
+  block: 
+    - name: rhel repo setup | add nfs-ganesha release package
+      package:
+        name: "{{ nfs_ganesha_release_package_rpm }}"
+        state: present
+      register: result
+      until: result is succeeded
+
+    - name: rhel repo setup | enable high availability repo
+      when: nfs_rados_backend_driver == "rados_ng"
+      shell: dnf config-manager --set-enabled ha
+
+- name: ubuntu repo setup | enable ubuntu repos
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  block:
+    - name: ubuntu repo setup | enable nfs ganesha repos
+      when: ceph_nfs_server == 'ganesha'
+      block:
+        - name: ubuntu repo setup | enable nfs-ganesha ppa
+          apt_repository:
+            repo: 'ppa:nfs-ganesha/nfs-ganesha-5'
+            state: present
+            update_cache: no
+          register: add_ganesha_apt_repo
+        
+        - name: update apt cache
+          apt:
+            update_cache: yes
+          register: update_ganesha_apt_cache
+          retries: 5
+          delay: 2
+          until: update_ganesha_apt_cache is success
+          when: add_ganesha_apt_repo is changed
+        
+        - name: ubuntu repo setup | enable libntirpc ppa
+          apt_repository:
+            repo: 'ppa:nfs-ganesha/libntirpc-5'
+            state: present
+            update_cache: no
+          register: add_libntirpc_apt_repo
+
+
+        - name: update apt cache
+          apt:
+            update_cache: yes
+          register: update_libntirpc_apt_cache
+          retries: 5
+          delay: 2
+          until: update_libntirpc_apt_cache is success
+          when: add_libntirpc_apt_repo is changed

@@ -1,0 +1,8 @@
+---
+- include: cephfs_backend.yml
+
+- include: configure_nfs_ganesha.yml
+  when: nfs_server == 'ganesha'
+
+- include: setup_pcs_cluster.yml
+  when: nfs_rados_backend_driver == 'rados_ng'
