@@ -1,0 +1,5 @@
+nfs-ansible (1.0.0-1jammy) jammy; urgency=medium
+
+  * initial build of nfs-ansible
+
+ -- Brett Kelly <bkelly@45drives.com>  Thu, 17 Apr 2025 06:47:40 -0300
