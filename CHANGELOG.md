@@ -1,3 +1,3 @@
-## nfs-ansible 1.0.0-1
+## nfs-ansible 1.0.1-1
 
-* initial build of nfs-ansible
+* fix incorrect varible name
