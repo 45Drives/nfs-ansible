@@ -20,7 +20,7 @@ nfs_log_file: "/var/log/ganesha/ganesha.log"
 nfs_fs_root: "nfs"
 
 nfs_keyring:
-  - { name: client.nfs, caps: { mds: "allow r path=/, allow rwps path=/{{ ceph_nfs_fs_root }}", mon: "allow r", osd: "allow *" }, mode: "0600" }
+  - { name: client.nfs, caps: { mds: "allow r path=/, allow rwps path=/{{ nfs_fs_root }}", mon: "allow r", osd: "allow *" }, mode: "0600" }
 
 nfs_ganesha_pool: 'nfs_ganesha'
 nfs_export_namespace: "ganesha-export"
