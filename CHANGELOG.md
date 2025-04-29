@@ -1,3 +1,3 @@
-## nfs-ansible 1.0.1-1
+## nfs-ansible 1.0.1-2
 
-* fix incorrect varible name
+* added missing ip lookup plugin

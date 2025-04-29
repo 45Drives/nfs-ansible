@@ -4,7 +4,7 @@
     "title": "nfs-ansible",
     "description": "Deploy nfs w. anisble ",
     "version": "1.0.1",
-    "build_number": "1",
+    "build_number": "2",
     "stable": true,
     "author": "Brett Kelly <bkelly@45drives.com>",
     "git_url": "https://github.com/45Drives/samba-ansible",
@@ -53,7 +53,7 @@
     "changelog": {
         "urgency": "medium",
         "version": "1.0.1",
-        "build_number": "1",
+        "build_number": "2",
         "date": null,
         "packager": "Brett Kelly <bkelly@45drives.com>",
         "changes": []
