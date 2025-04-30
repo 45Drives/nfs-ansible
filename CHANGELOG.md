@@ -1,3 +1,3 @@
-## nfs-ansible 1.0.1-2
+## nfs-ansible 1.0.1-3
 
-* added missing ip lookup plugin
+* updated makefile to include plugin dir

@@ -1,3 +1,9 @@
+nfs-ansible (1.0.1-3focal) focal; urgency=medium
+
+  * updated makefile to include plugin dir
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 30 Apr 2025 06:49:00 -0300
+
 nfs-ansible (1.0.1-2focal) focal; urgency=medium
 
   * added missing ip lookup plugin
