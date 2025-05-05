@@ -1,3 +1,3 @@
-## nfs-ansible 1.0.1-3
+## nfs-ansible 1.0.2-1
 
-* updated makefile to include plugin dir
+* Made changes to repository.yml, group_vars/nfss.yml, and the ceph configuration yml to add Rocky9/Ubuntu22 support.

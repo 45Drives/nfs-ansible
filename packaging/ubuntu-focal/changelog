@@ -1,3 +1,10 @@
+nfs-ansible (1.0.2-1focal) focal; urgency=medium
+
+  * Made changes to repository.yml, group_vars/nfss.yml, and the ceph configuration
+    yml to add Rocky9/Ubuntu22 support.
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 05 May 2025 11:21:26 -0300
+
 nfs-ansible (1.0.1-3focal) focal; urgency=medium
 
   * updated makefile to include plugin dir
