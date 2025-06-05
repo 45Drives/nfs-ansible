@@ -40,14 +40,15 @@
         state: absent 
 
 - name: cephfs backend | Create NFS cephx user
-  ceph_key:
-    name: "{{ item.name }}"
-    state: present
-    caps: "{{ item.caps }}"
-    cluster: "{{ cluster }}"
-    secret: "{{ item.key | default('') }}"
+  command: >
+    ceph auth add {{ item.name }}
+    mds '{{ item.caps.mds }}'
+    mon '{{ item.caps.mon }}'
+    osd '{{ item.caps.osd }}'
   with_items: "{{ nfs_keyring }}"
   delegate_to: "{{ groups['mons'][0] }}"
+  changed_when: true
+  run_once: true
 
 - name: create pool for nfs-ganesha
   when: nfs_server == 'ganesha'

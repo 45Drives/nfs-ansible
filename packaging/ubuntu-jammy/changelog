@@ -1,3 +1,22 @@
+nfs-ansible (1.0.2-1jammy) jammy; urgency=medium
+
+  * Made changes to repository.yml, group_vars/nfss.yml, and the ceph configuration
+    yml to add Rocky9/Ubuntu22 support.
+
+ -- Brett Kelly <bkelly@45drives.com>  Mon, 05 May 2025 11:21:26 -0300
+
+nfs-ansible (1.0.1-3jammy) jammy; urgency=medium
+
+  * updated makefile to include plugin dir
+
+ -- Brett Kelly <bkelly@45drives.com>  Wed, 30 Apr 2025 06:49:00 -0300
+
+nfs-ansible (1.0.1-2jammy) jammy; urgency=medium
+
+  * added missing ip lookup plugin
+
+ -- Brett Kelly <bkelly@45drives.com>  Tue, 29 Apr 2025 13:26:18 -0300
+
 nfs-ansible (1.0.1-1jammy) jammy; urgency=medium
 
   * fix incorrect varible name

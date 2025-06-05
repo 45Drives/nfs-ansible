@@ -12,8 +12,12 @@
       until: result is succeeded
 
     - name: rhel repo setup | enable high availability repo
-      when: nfs_rados_backend_driver == "rados_ng"
+      when: nfs_rados_backend_driver == "rados_ng" and ansible_distribution_major_version == '8'
       shell: dnf config-manager --set-enabled ha
+
+    - name: rhel repo setup | enable high availability repo (RHEL9)
+      when: nfs_rados_backend_driver == "rados_ng" and ansible_distribution_major_version == '9'
+      shell: dnf config-manager --set-enabled highavailability
 
 - name: ubuntu repo setup | enable ubuntu repos
   when: ansible_facts['distribution'] == 'Ubuntu'
